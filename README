@@ -1,0 +1,1 @@
+A message queue based on resque and dreque using mongodb as storage system instead of redis
