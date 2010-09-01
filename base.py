@@ -1,11 +1,14 @@
 import pymongo
 
-class MongoMQ(object):
+class Monque(object):
 
-    def __init__(self):
-        self.mongo = pymongo.Connection()
-        self.db = self.mongo.mongomq
+    def __init__(self, server="localhost", port=27017):
+        self.mongo = self._connect(server, port)
+        self.db = self.mongo.monque
 
+    def _connect(self, server, port):
+        return pymongo.Connection(server, port)
+    
     def enqueue(self, queue, job, *args, **kwargs):
         _queue = self.db[queue]
         _queue.insert(self._encode(job, *args, **kwargs))
@@ -15,6 +18,7 @@ class MongoMQ(object):
                 limit=1, 
                 sort=[('_id', pymongo.DESCENDING)]
             ).next()
+        self.db[queue].remove(job['_id'])
         return self._decode(job)
 
     def _encode(self, job, *args, **kwargs):
